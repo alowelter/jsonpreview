@@ -211,12 +211,12 @@
     <div class="container">
         <div class="header">
             <h1>🔍 Visualizador de JSON</h1>
-            <p>Cole seu JSON bruto e veja ele formatado e colorido</p>
+            <p>Cole seu JSON e veja ele formatado e colorido</p>
         </div>
         
         <div class="content">
             <div class="input-section">
-                <h2 class="section-title">JSON Bruto</h2>
+                <h2 class="section-title">JSON</h2>
                 <div class="controls">
                     <button class="btn-primary" onclick="formatJson()">Formatar JSON</button>
                     <button class="btn-secondary" onclick="copyOutput()">Copiar Resultado</button>
@@ -231,7 +231,7 @@
             </div>
             
             <div class="output-section">
-                <h2 class="section-title">JSON Formatado</h2>
+                <h2 class="section-title">Visualização</h2>
                 <div class="json-output" id="jsonOutput">
                     <span style="color: #888; font-style: italic;">O JSON formatado aparecerá aqui...</span>
                 </div>
@@ -329,7 +329,7 @@
 
         // Exemplo inicial
         document.addEventListener('DOMContentLoaded', function() {
-            const exampleJson = '{"usuario":"Marcelo","profissao":"Desenvolvedor Web","tecnologias":["JavaScript","ReactJS","NodeJS"],"servidor":"AlmaLinux","ativo":true,"projetos":3}';
+            const exampleJson = '';
             document.getElementById('jsonInput').value = exampleJson;
             formatJson();
         });
