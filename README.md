@@ -2,4 +2,4 @@
 
 Visualize e explore código JSON de forma simples e organizada.
 
-🔗 [Acesse aqui](http://jsonpreview.welm.com.br/)
+🔗 [Acesse aqui](http://jsonpreview.welm.com.br/) http://jsonpreview.welm.com.br/
