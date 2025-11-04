@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizador de JSON</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -11,19 +12,23 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
-            width: 100%;
-            heigth: 100%;
-            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
             overflow: hidden;
@@ -32,63 +37,122 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 30px;
+            padding: 15px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 1.8em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-
         .content {
-            padding: 30px;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            padding: 10px;
+            gap: 10px;
+            overflow: hidden;
         }
 
         .input-section, .output-section {
             display: flex;
             flex-direction: column;
-            width: 100%;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
         }
 
         .section-title {
-            font-size: 1.3em;
+            font-size: 1.1em;
             font-weight: 600;
-            margin-bottom: 15px;
             color: #333;
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-right: auto;
         }
 
         .section-title::before {
             content: '';
             width: 4px;
-            height: 25px;
+            height: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 2px;
         }
 
+        .icon-button {
+            background: transparent;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 4px;
+            transition: all 0.2s ease;
+            margin-left: 8px;
+        }
+
+        .icon-button:hover {
+            color: #764ba2;
+            transform: scale(1.1);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8em;
+            pointer-events: none;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
         textarea {
-            width: 100%;
-            height: 200px;
-            padding: 20px;
+            flex: 1;
+            padding: 15px;
             border: 2px solid #e0e0e0;
-            border-radius: 15px;
+            border-radius: 10px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
-            resize: vertical;
+            resize: none;
             transition: all 0.3s ease;
             background: #f8f9fa;
+            min-height: 0;
         }
 
         textarea:focus {
@@ -99,90 +163,44 @@
         }
 
         .json-output {
+            flex: 1;
             background: #1e1e1e;
             color: #d4d4d4;
-            padding: 20px;
-            border-radius: 15px;
+            padding: 15px;
+            border-radius: 10px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
             line-height: 1.6;
-            overflow-x: auto;
+            overflow: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
-            height: 300px;
-            overflow-y: auto;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #f8f9fa;
-            color: #333;
-            border: 2px solid #e0e0e0;
-        }
-
-        .btn-secondary:hover {
-            background: #e9ecef;
-            border-color: #bbb;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-        }
-
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+            min-height: 0;
         }
 
         .error {
             background: #fff5f5;
             border: 2px solid #fed7d7;
             color: #c53030;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
             font-weight: 500;
+            font-size: 0.9em;
         }
 
         .success {
             background: #f0fff4;
             border: 2px solid #9ae6b4;
             color: #2d7d32;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
             font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        #message {
+            min-height: 40px;
         }
 
         .json-string { color: #ce9178; }
@@ -193,24 +211,23 @@
         .json-brace { color: #ffd700; }
         .json-bracket { color: #ffd700; }
 
-        @media (max-width: 768px) {
-            .container {
-                max-width: 100%;
-                border-radius: 0;
-            }
-
+        @media (min-width: 768px) {
             .content {
-                padding: 15px;
-                gap: 15px;
+                flex-direction: row;
             }
+            
+            .input-section, .output-section {
+                width: 50%;
+            }
+        }
 
+        @media (max-height: 600px) {
+            .header {
+                padding: 8px;
+            }
+            
             .header h1 {
-                font-size: 2em;
-            }
-
-            textarea, .json-output {
-                height: 140px;
-                padding: 12px;
+                font-size: 1.5em;
             }
         }
     </style>
@@ -223,10 +240,14 @@
         
         <div class="content">
             <div class="input-section">
-                <h2 class="section-title">JSON</h2>
-                <div class="controls">
-                    <button class="btn-primary" onclick="formatJson()">Formatar JSON</button>
-                    <button class="btn-secondary" onclick="copyOutput()">Copiar Resultado</button>
+                <div class="section-header">
+                    <h2 class="section-title">JSON</h2>
+                    <div class="tooltip">
+                        <button class="icon-button" onclick="clearAll()">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        <span class="tooltiptext">Limpar</span>
+                    </div>
                 </div>
                 <div id="message"></div>
                 <textarea 
@@ -237,7 +258,15 @@
             </div>
             
             <div class="output-section">
-                <h2 class="section-title">Visualização</h2>
+                <div class="section-header">
+                    <h2 class="section-title">Visualização</h2>
+                    <div class="tooltip">
+                        <button class="icon-button" onclick="copyOutput()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <span class="tooltiptext">Copiar</span>
+                    </div>
+                </div>
                 <div class="json-output" id="jsonOutput">
                     <span style="color: #888; font-style: italic;">O JSON formatado aparecerá aqui...</span>
                 </div>
@@ -282,7 +311,7 @@
             const output = document.getElementById('jsonOutput');
             
             if (!input) {
-                showMessage('Por favor, insira um JSON para formatar.', 'error');
+                output.innerHTML = '<span style="color: #888; font-style: italic;">O JSON formatado aparecerá aqui...</span>';
                 return;
             }
             
@@ -292,7 +321,6 @@
                 const highlighted = syntaxHighlight(formatted);
                 
                 output.innerHTML = highlighted;
-                showMessage('JSON formatado com sucesso!', 'success');
             } catch (error) {
                 output.innerHTML = `<span style="color: #ff6b6b;">❌ Erro no JSON: ${error.message}</span>`;
                 showMessage('JSON inválido. Verifique a sintaxe.', 'error');
@@ -303,12 +331,8 @@
             clearTimeout(autoFormatTimeout);
             autoFormatTimeout = setTimeout(() => {
                 const input = document.getElementById('jsonInput').value.trim();
-                if (input) {
-                    formatJson();
-                } else {
-                    document.getElementById('jsonOutput').innerHTML = '<span style="color: #888; font-style: italic;">O JSON formatado aparecerá aqui...</span>';
-                }
-            }, 500);
+                formatJson();
+            }, 300);
         }
 
         function copyOutput() {
@@ -333,11 +357,22 @@
             showMessage('Campos limpos!', 'success');
         }
 
-        // Exemplo inicial
+        // Ajusta altura com base no viewport
+        function resizeTextareas() {
+            const content = document.querySelector('.content');
+            
+            // Assegura que o layout seja responsivo
+            if (window.innerWidth >= 768) {
+                content.style.flexDirection = 'row';
+            } else {
+                content.style.flexDirection = 'column';
+            }
+        }
+
+        // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
-            const exampleJson = '';
-            document.getElementById('jsonInput').value = exampleJson;
-            formatJson();
+            resizeTextareas();
+            window.addEventListener('resize', resizeTextareas);
         });
     </script>
 </body>
